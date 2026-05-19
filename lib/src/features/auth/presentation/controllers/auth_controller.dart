@@ -82,7 +82,8 @@ class AuthController extends GetxController {
         password: password,
       );
       return signInRes.user != null;
-    } on AuthException {
+    } on AuthException catch (e) {
+      debugPrint('signIn failed: ${e.message}');
       try {
         final signUpRes = await AppConfig.supabase.auth.signUp(
           email: _phoneToEmail(phoneNumber),
@@ -92,11 +93,20 @@ class AuthController extends GetxController {
           return true;
         }
         if (signUpRes.user != null && signUpRes.session == null) {
+          await Future.delayed(const Duration(seconds: 1));
           final retry = await AppConfig.supabase.auth.signInWithPassword(
             email: _phoneToEmail(phoneNumber),
             password: _phoneToPassword(phoneNumber),
           );
-          return retry.user != null;
+          if (retry.user != null) return true;
+          Get.snackbar(
+            'Cannot log in',
+            'Supabase "Confirm email" is ON. Go to Supabase Dashboard → Authentication → Settings → Turn OFF "Confirm email".\n\n'
+            'Phone: $phoneNumber',
+            duration: const Duration(seconds: 8),
+            snackPosition: SnackPosition.BOTTOM,
+          );
+          return false;
         }
         return false;
       } on AuthException catch (e) {
