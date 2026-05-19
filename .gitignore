@@ -1,0 +1,41 @@
+# Flutter
+build/
+.dart_tool/
+.packages
+.pub/
+.pub-cache/
+pubspec.lock
+.flutter-plugins
+.flutter-plugins-dependencies
+.last_build_id
+flutter_bootstrap.js
+flutter_service_worker.js
+flutter.js
+main.dart.js
+version.json
+manifest.json
+canvaskit/
+assets/AssetManifest*
+assets/FontManifest*
+assets/NOTICES
+assets/shaders/
+assets/assets/
+
+# Android
+android/.gradle/
+android/app/build/
+android/local.properties
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env (publishable keys - committed for CI)
+#.env
