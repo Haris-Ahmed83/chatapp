@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:chato/src/shared/widgets/wa_chat_bubble.dart';
 import 'package:chato/src/features/chats/presentation/controllers/chat_controller.dart';
 import 'package:chato/src/config/app_config.dart';
 
@@ -89,10 +88,34 @@ class _ChatScreenState extends State<ChatScreen> {
                 final time = (msg['created_at'] as String?) ?? '';
                 final timeStr = time.isNotEmpty ? time.substring(11, 16) : '';
 
-                return WaChatBubble(
-                  message: msg['content'] as String? ?? '',
-                  time: timeStr,
-                  isSent: isSent,
+                final bubbleColor = isSent ? const Color(0xFFDCF8C6) : Colors.white;
+                return Align(
+                  alignment: isSent ? Alignment.centerRight : Alignment.centerLeft,
+                  child: Container(
+                    constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+                    margin: const EdgeInsets.only(bottom: 4),
+                    padding: const EdgeInsets.fromLTRB(12, 8, 12, 6),
+                    decoration: BoxDecoration(
+                      color: bubbleColor,
+                      borderRadius: BorderRadius.only(
+                        topLeft: const Radius.circular(12),
+                        topRight: const Radius.circular(12),
+                        bottomLeft: isSent ? const Radius.circular(12) : Radius.zero,
+                        bottomRight: isSent ? Radius.zero : const Radius.circular(12),
+                      ),
+                      boxShadow: [
+                        BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 1, offset: const Offset(0, 1)),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(msg['content'] as String? ?? '', style: const TextStyle(fontSize: 15)),
+                        const SizedBox(height: 2),
+                        Text(timeStr, style: TextStyle(fontSize: 11, color: Colors.grey[500])),
+                      ],
+                    ),
+                  ),
                 );
               },
             )),

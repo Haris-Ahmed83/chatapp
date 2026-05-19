@@ -2,7 +2,7 @@ import 'package:get/get.dart';
 import 'package:chato/src/routing/app_routes.dart';
 import 'package:chato/src/features/auth/presentation/screens/welcome_screen.dart';
 import 'package:chato/src/features/auth/presentation/screens/phone_input_screen.dart';
-import 'package:chato/src/features/auth/presentation/screens/otp_screen.dart';
+
 import 'package:chato/src/features/auth/presentation/screens/profile_setup_screen.dart';
 import 'package:chato/src/features/home/presentation/screens/home_screen.dart';
 import 'package:chato/src/features/chats/presentation/screens/chat_screen.dart';
@@ -19,10 +19,7 @@ class AppRouter {
       name: AppRoutes.phoneInput,
       page: () => const PhoneInputScreen(),
     ),
-    GetPage(
-      name: AppRoutes.otpVerification,
-      page: () => const OtpScreen(),
-    ),
+
     GetPage(
       name: AppRoutes.profileSetup,
       page: () => const ProfileSetupScreen(),
