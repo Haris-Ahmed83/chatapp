@@ -22,13 +22,15 @@ class AuthController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    AppConfig.auth.authStateChanges().listen((user) {
-      isLoggedIn.value = user != null;
-      if (user != null) {
-        if (user.displayName != null) displayName.value = user.displayName!;
-        if (user.photoURL != null) photoUrl.value = user.photoURL!;
-      }
-    });
+    try {
+      AppConfig.auth.authStateChanges().listen((user) {
+        isLoggedIn.value = user != null;
+        if (user != null) {
+          if (user.displayName != null) displayName.value = user.displayName!;
+          if (user.photoURL != null) photoUrl.value = user.photoURL!;
+        }
+      });
+    } catch (_) {}
   }
 
   String cleanPhone(String raw) {

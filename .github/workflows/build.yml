@@ -17,20 +17,35 @@ jobs:
 
       - run: flutter pub get
 
-      - name: Build APK
-        run: flutter build apk --release
+      - name: Restore or generate keystore
+        id: keystore
+        uses: actions/cache@v4
+        with:
+          path: android/app/keystore.jks
+          key: keystore-${{ runner.os }}
 
-      - name: Generate keystore + Get SHA
+      - name: Generate keystore if missing
+        if: steps.keystore.outputs.cache-hit != 'true'
         run: |
-          mkdir -p ~/.android
-          keytool -genkey -v -keystore ~/.android/debug.keystore -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US" -storepass android -keypass android 2>/dev/null
+          keytool -genkey -v -keystore android/app/keystore.jks -alias chato -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Chato,OU=,O=Chato,L=,S=,C=PK" -storepass chato123 -keypass chato123
+
+      - name: Extract SHA fingerprints
+        run: |
           echo "=== SHA-1 ==="
-          keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android 2>/dev/null | grep "SHA1:" | awk '{print $2}'
+          keytool -list -v -keystore android/app/keystore.jks -alias chato -storepass chato123 2>/dev/null | grep "SHA1:" | awk '{print $2}'
           echo "=== SHA-256 ==="
-          keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android 2>/dev/null | grep "SHA256:" | awk '{print $2}'
+          keytool -list -v -keystore android/app/keystore.jks -alias chato -storepass chato123 2>/dev/null | grep "SHA256:" | awk '{print $2}'
           echo "---"
           echo "Add these SHA fingerprints to Firebase Console at:"
           echo "https://console.firebase.google.com/project/chatapp-8a2d9/settings/general/android:com.example.chato"
+
+      - name: Build APK
+        run: flutter build apk --release
+        env:
+          KEYSTORE_PATH: android/app/keystore.jks
+          KEYSTORE_PASSWORD: chato123
+          KEY_ALIAS: chato
+          KEY_PASSWORD: chato123
 
       - name: Build Web
         run: flutter build web --release
