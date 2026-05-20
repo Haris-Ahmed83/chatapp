@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:chato/src/routing/app_routes.dart';
+
 import 'package:chato/src/features/auth/screens/welcome_screen.dart';
 import 'package:chato/src/features/auth/screens/phone_input_screen.dart';
 import 'package:chato/src/features/auth/screens/otp_screen.dart';

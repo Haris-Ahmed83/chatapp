@@ -7,16 +7,6 @@ class ChatController extends GetxController {
   final messages = <Map<String, dynamic>>[].obs;
   final currentChatId = ''.obs;
 
-  Stream<QuerySnapshot>? _chatsStream;
-  Stream<QuerySnapshot>? _messagesStream;
-
-  @override
-  void onClose() {
-    _chatsStream = null;
-    _messagesStream = null;
-    super.onClose();
-  }
-
   void loadChats() {
     final uid = AppConfig.auth.currentUser?.uid;
     if (uid == null) return;
@@ -28,7 +18,7 @@ class ChatController extends GetxController {
         .snapshots()
         .listen((snapshot) {
       chats.value = snapshot.docs.map((doc) {
-        final data = doc.data() as Map<String, dynamic>;
+        final data = doc.data();
         data['id'] = doc.id;
         return data;
       }).toList();
@@ -47,7 +37,7 @@ class ChatController extends GetxController {
         .snapshots()
         .listen((snapshot) {
       messages.value = snapshot.docs.map((doc) {
-        final data = doc.data() as Map<String, dynamic>;
+        final data = doc.data();
         data['id'] = doc.id;
         return data;
       }).toList();

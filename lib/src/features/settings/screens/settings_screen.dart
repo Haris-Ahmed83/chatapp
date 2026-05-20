@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:chato/src/features/auth/controllers/auth_controller.dart';
+import 'package:chato/src/routing/app_routes.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -55,7 +56,7 @@ class SettingsScreen extends StatelessWidget {
             title: const Text('Log out', style: TextStyle(color: Colors.red)),
             onTap: () async {
               await auth.signOut();
-              Get.offAllNamed('/welcome');
+              Get.offAllNamed(AppRoutes.welcome);
             },
           )),
         ],
