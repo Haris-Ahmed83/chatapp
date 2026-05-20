@@ -1,12 +1,10 @@
-abstract final class AppRoutes {
-  AppRoutes._();
-
-  static const String welcome = '/welcome';
-  static const String phoneInput = '/phone-input';
-  static const String otpVerification = '/otp-verification';
-  static const String profileSetup = '/profile-setup';
-  static const String home = '/';
-  static const String chat = '/chat';
-  static const String call = '/call';
-  static const String settings = '/settings';
+class AppRoutes {
+  static const welcome = '/welcome';
+  static const phoneInput = '/phone-input';
+  static const otpVerification = '/otp-verification';
+  static const profileSetup = '/profile-setup';
+  static const home = '/home';
+  static const chat = '/chat';
+  static const call = '/call';
+  static const settings = '/settings';
 }

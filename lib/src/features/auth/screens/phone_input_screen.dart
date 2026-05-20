@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:chato/src/features/auth/presentation/controllers/auth_controller.dart';
+import 'package:chato/src/features/auth/controllers/auth_controller.dart';
 
 class PhoneInputScreen extends StatefulWidget {
   const PhoneInputScreen({super.key});
@@ -65,6 +65,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
     final auth = Get.find<AuthController>();
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: const Color(0xFF075E54),
         leading: IconButton(
@@ -73,17 +74,21 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.symmetric(horizontal: 24),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            const SizedBox(height: 32),
+            const Icon(Icons.chat_bubble_outline, size: 48, color: Color(0xFF075E54)),
+            const SizedBox(height: 16),
             const Text(
               'Enter your phone number',
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
             Text(
-              'Chato will verify your phone number.',
+              'Chato will send an SMS message to verify your phone number.\nEnter your country code and phone number:',
+              textAlign: TextAlign.center,
               style: TextStyle(fontSize: 14, color: Colors.grey[600], height: 1.4),
             ),
             const SizedBox(height: 32),
@@ -94,12 +99,12 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                   height: 48,
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.grey[300]!),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(4),
                   ),
-                  child: Obx(() => DropdownButtonHideUnderline(
+                  child: DropdownButtonHideUnderline(
                     child: DropdownButton<String>(
                       value: auth.countryCode.value,
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(4),
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       isDense: true,
                       items: _countries.map((c) => DropdownMenuItem(
@@ -110,7 +115,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                         if (v != null) auth.countryCode.value = v;
                       },
                     ),
-                  )),
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -121,31 +126,28 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                     decoration: InputDecoration(
                       hintText: 'Phone number',
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(4),
                       ),
                     ),
                   ),
                 ),
               ],
             ),
-            const Spacer(),
-            Obx(() => SizedBox(
+            const SizedBox(height: 24),
+            SizedBox(
               width: double.infinity,
               height: 48,
               child: ElevatedButton(
                 onPressed: auth.isLoading.value
                     ? null
-                    : () async {
+                    : () {
                         final digits = _phoneController.text.trim();
-                        final phone = '${auth.countryCode.value}$digits';
                         if (digits.length < 6) {
                           Get.snackbar('Invalid', 'Please enter a valid phone number.');
                           return;
                         }
-                        final success = await auth.loginWithPhone(phone);
-                        if (!success) {
-                          Get.snackbar('Error', 'Something went wrong. Please try again.');
-                        }
+                        final phone = '${auth.countryCode.value}$digits';
+                        auth.sendOtp(phone);
                       },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF075E54),
@@ -154,19 +156,15 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                     borderRadius: BorderRadius.circular(24),
                   ),
                 ),
-                child: auth.isLoading.value
+                child: Obx(() => auth.isLoading.value
                     ? const SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                        ),
+                        width: 24, height: 24,
+                        child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(Colors.white)),
                       )
-                    : const Text('Next', style: TextStyle(fontSize: 16)),
+                    : const Text('NEXT', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+                ),
               ),
-            )),
-            const SizedBox(height: 32),
+            ),
           ],
         ),
       ),
