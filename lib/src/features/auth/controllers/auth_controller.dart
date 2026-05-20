@@ -15,8 +15,6 @@ class AuthController extends GetxController {
   final verificationId = ''.obs;
   final countryCode = '+92'.obs;
 
-  int? _forceCode;
-
   User? get user => AppConfig.auth.currentUser;
 
   @override
@@ -45,23 +43,29 @@ class AuthController extends GetxController {
         phoneNumber: phoneNumber,
         timeout: const Duration(seconds: 60),
         verificationCompleted: (credential) async {
-          await AppConfig.auth.signInWithCredential(credential);
-          Get.offAllNamed(AppRoutes.home);
+          try {
+            await AppConfig.auth.signInWithCredential(credential);
+            await _checkProfile();
+          } catch (e) {
+            Get.snackbar('Error', '$e', snackPosition: SnackPosition.BOTTOM, duration: const Duration(seconds: 5));
+          }
         },
         verificationFailed: (e) {
+          isLoading.value = false;
           Get.snackbar('Error', '${e.message}', snackPosition: SnackPosition.BOTTOM, duration: const Duration(seconds: 5));
         },
         codeSent: (vid, forceCode) {
           verificationId.value = vid;
-          _forceCode = forceCode;
+          isLoading.value = false;
           Get.toNamed(AppRoutes.otpVerification);
         },
-        codeAutoRetrievalTimeout: (vid) {},
+        codeAutoRetrievalTimeout: (vid) {
+          isLoading.value = false;
+        },
       );
     } catch (e) {
-      Get.snackbar('Error', '$e', snackPosition: SnackPosition.BOTTOM, duration: const Duration(seconds: 5));
-    } finally {
       isLoading.value = false;
+      Get.snackbar('Error', '$e', snackPosition: SnackPosition.BOTTOM, duration: const Duration(seconds: 5));
     }
   }
 
@@ -87,17 +91,19 @@ class AuthController extends GetxController {
 
     try {
       final doc = await AppConfig.firestore.collection('profiles').doc(uid).get();
-      if (doc.exists && doc.data()?['display_name'] != null) {
-        displayName.value = doc['display_name'];
-        photoUrl.value = doc['photo_url'] ?? '';
-        status.value = doc['status'] ?? '';
+      final data = doc.data();
+      if (doc.exists && data != null && data['display_name'] != null) {
+        displayName.value = data['display_name'] as String;
+        photoUrl.value = (data['photo_url'] as String?) ?? '';
+        status.value = (data['status'] as String?) ?? 'Hey there! I am using Chato';
         isProfileComplete.value = true;
         Get.offAllNamed(AppRoutes.home);
       } else {
         isProfileComplete.value = false;
         Get.toNamed(AppRoutes.profileSetup);
       }
-    } catch (_) {
+    } catch (e) {
+      isProfileComplete.value = false;
       Get.toNamed(AppRoutes.profileSetup);
     }
   }
@@ -115,7 +121,7 @@ class AuthController extends GetxController {
         'photo_url': photoUrl.value,
         'status': status.value,
         'last_seen': FieldValue.serverTimestamp(),
-      });
+      }, SetOptions(merge: true));
 
       displayName.value = name;
       isProfileComplete.value = true;

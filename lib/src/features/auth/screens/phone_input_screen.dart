@@ -138,18 +138,17 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
               width: double.infinity,
               height: 48,
               child: ElevatedButton(
-                onPressed: auth.isLoading.value
-                    ? null
-                    : () {
-                        var digits = _phoneController.text.trim();
-                        if (digits.length < 6) {
-                          Get.snackbar('Invalid', 'Please enter a valid phone number.');
-                          return;
-                        }
-                        if (digits.startsWith('0')) digits = digits.substring(1);
-                        final phone = '${auth.countryCode.value}$digits';
-                        auth.sendOtp(phone);
-                      },
+                onPressed: () {
+                    if (auth.isLoading.value) return;
+                    var digits = _phoneController.text.trim();
+                    if (digits.length < 6) {
+                      Get.snackbar('Invalid', 'Please enter a valid phone number.');
+                      return;
+                    }
+                    if (digits.startsWith('0')) digits = digits.substring(1);
+                    final phone = '${auth.countryCode.value}$digits';
+                    auth.sendOtp(phone);
+                  },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF075E54),
                   foregroundColor: Colors.white,

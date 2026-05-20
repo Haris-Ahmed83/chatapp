@@ -72,16 +72,15 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
               width: double.infinity,
               height: 48,
               child: ElevatedButton(
-                onPressed: auth.isLoading.value
-                    ? null
-                    : () {
-                        final name = _nameController.text.trim();
-                        if (name.isEmpty) {
-                          Get.snackbar('Name required', 'Please enter your name');
-                          return;
-                        }
-                        auth.saveProfile(name);
-                      },
+                onPressed: () {
+                    if (auth.isLoading.value) return;
+                    final name = _nameController.text.trim();
+                    if (name.isEmpty) {
+                      Get.snackbar('Name required', 'Please enter your name');
+                      return;
+                    }
+                    auth.saveProfile(name);
+                  },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF075E54),
                   foregroundColor: Colors.white,

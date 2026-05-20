@@ -92,12 +92,11 @@ class _OtpScreenState extends State<OtpScreen> {
               width: double.infinity,
               height: 48,
               child: ElevatedButton(
-                onPressed: auth.isLoading.value
-                    ? null
-                    : () {
-                        final code = _codeController.text.trim();
-                        if (code.length == 6) auth.verifyOtp(code);
-                      },
+                onPressed: () {
+                    if (auth.isLoading.value) return;
+                    final code = _codeController.text.trim();
+                    if (code.length == 6) auth.verifyOtp(code);
+                  },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF075E54),
                   foregroundColor: Colors.white,
