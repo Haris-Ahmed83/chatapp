@@ -21,7 +21,7 @@ jobs:
         run: flutter build apk --release
 
       - name: Build Web
-        run: flutter build web --release --web-renderer html
+        run: flutter build web --release
 
       - uses: actions/upload-artifact@v4
         with:
@@ -38,6 +38,9 @@ jobs:
           cd hf-space
           rm -rf *
           cp -r ../build/web/* .
+          rm -rf canvaskit
           git add -A
-          git commit -m "auto-deploy from GitHub Actions"
-          git push
+          git diff --cached --quiet || {
+            git commit -m "auto-deploy from GitHub Actions"
+            git push
+          }
