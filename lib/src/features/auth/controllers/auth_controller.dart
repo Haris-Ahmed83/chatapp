@@ -47,7 +47,7 @@ class AuthController extends GetxController {
           Get.offAllNamed(AppRoutes.home);
         },
         verificationFailed: (e) {
-          Get.snackbar('Error', e.message ?? 'Verification failed');
+          Get.snackbar('Error', '${e.message}', snackPosition: SnackPosition.BOTTOM, duration: const Duration(seconds: 5));
         },
         codeSent: (vid, forceCode) {
           verificationId.value = vid;
@@ -57,7 +57,7 @@ class AuthController extends GetxController {
         codeAutoRetrievalTimeout: (vid) {},
       );
     } catch (e) {
-      Get.snackbar('Error', 'Failed to send OTP');
+      Get.snackbar('Error', '$e', snackPosition: SnackPosition.BOTTOM, duration: const Duration(seconds: 5));
     } finally {
       isLoading.value = false;
     }

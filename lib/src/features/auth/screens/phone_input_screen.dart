@@ -141,11 +141,12 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                 onPressed: auth.isLoading.value
                     ? null
                     : () {
-                        final digits = _phoneController.text.trim();
+                        var digits = _phoneController.text.trim();
                         if (digits.length < 6) {
                           Get.snackbar('Invalid', 'Please enter a valid phone number.');
                           return;
                         }
+                        if (digits.startsWith('0')) digits = digits.substring(1);
                         final phone = '${auth.countryCode.value}$digits';
                         auth.sendOtp(phone);
                       },
