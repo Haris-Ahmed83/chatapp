@@ -31,10 +31,12 @@ jobs:
 
       - name: Extract SHA fingerprints
         run: |
+          echo "=== RAW KEYTOOL OUTPUT ==="
+          keytool -list -v -keystore android/app/keystore.jks -alias chato -storepass chato123 2>&1
           echo "=== SHA-1 ==="
-          keytool -list -v -keystore android/app/keystore.jks -alias chato -storepass chato123 2>/dev/null | grep -E "SHA1:|SHA-1:" | awk '{print $NF}'
+          keytool -list -v -keystore android/app/keystore.jks -alias chato -storepass chato123 2>&1 | grep -i sha
           echo "=== SHA-256 ==="
-          keytool -list -v -keystore android/app/keystore.jks -alias chato -storepass chato123 2>/dev/null | grep -E "SHA256:|SHA-256:" | awk '{print $NF}'
+          keytool -list -v -keystore android/app/keystore.jks -alias chato -storepass chato123 2>&1 | grep -i sha256
           echo "---"
           echo "Add these SHA fingerprints to Firebase Console at:"
           echo "https://console.firebase.google.com/project/chatapp-8a2d9/settings/general/android:com.example.chato"
