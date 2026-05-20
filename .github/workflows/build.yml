@@ -20,11 +20,16 @@ jobs:
       - name: Build APK
         run: flutter build apk --release
 
-      - name: Get SHA fingerprints
+      - name: Generate keystore + Get SHA
         run: |
-          keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android 2>/dev/null | grep -E "SHA[0-9]*:" || echo "No debug keystore found"
+          mkdir -p ~/.android
+          keytool -genkey -v -keystore ~/.android/debug.keystore -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US" -storepass android -keypass android 2>/dev/null
+          echo "=== SHA-1 ==="
+          keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android 2>/dev/null | grep "SHA1:" | awk '{print $2}'
+          echo "=== SHA-256 ==="
+          keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android 2>/dev/null | grep "SHA256:" | awk '{print $2}'
           echo "---"
-          echo "Add these SHA fingerprints to Firebase Console:"
+          echo "Add these SHA fingerprints to Firebase Console at:"
           echo "https://console.firebase.google.com/project/chatapp-8a2d9/settings/general/android:com.example.chato"
 
       - name: Build Web
