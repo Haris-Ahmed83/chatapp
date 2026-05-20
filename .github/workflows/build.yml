@@ -29,12 +29,15 @@ jobs:
           path: build/app/outputs/flutter-apk/app-release.apk
 
       - name: Deploy to HF Space
-        uses: huggingface/huggingface-spaces@main
-        with:
-          domain: spaces
-          space: Haris-83/chato
-          token: ${{ secrets.HF_TOKEN }}
-          files: |
-            build/web/
-            --delete
-          commit_message: auto-deploy from GitHub Actions
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          git config --global user.name "Haris-Ahmed83"
+          git config --global user.email "haris@example.com"
+          git clone https://Haris-83:$HF_TOKEN@huggingface.co/spaces/Haris-83/chato hf-space
+          cd hf-space
+          rm -rf *
+          cp -r ../build/web/* .
+          git add -A
+          git commit -m "auto-deploy from GitHub Actions"
+          git push
