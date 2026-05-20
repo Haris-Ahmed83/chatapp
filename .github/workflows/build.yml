@@ -41,9 +41,9 @@ jobs:
           rm -rf canvaskit
           echo '---' > README.md
           echo 'title: Chato' >> README.md
-          echo 'emoji: 💬' >> README.md
+          echo 'emoji: speech_balloon' >> README.md
           echo 'colorFrom: green' >> README.md
-          echo 'colorTo: teal' >> README.md
+          echo 'colorTo: blue' >> README.md
           echo 'sdk: static' >> README.md
           echo 'pinned: false' >> README.md
           echo '---' >> README.md
