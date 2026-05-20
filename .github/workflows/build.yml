@@ -39,14 +39,7 @@ jobs:
           rm -rf *
           cp -r ../build/web/* .
           rm -rf canvaskit
-          echo '---' > README.md
-          echo 'title: Chato' >> README.md
-          echo 'emoji: speech_balloon' >> README.md
-          echo 'colorFrom: green' >> README.md
-          echo 'colorTo: blue' >> README.md
-          echo 'sdk: static' >> README.md
-          echo 'pinned: false' >> README.md
-          echo '---' >> README.md
+          printf '---\ntitle: Chato\nemoji: \U0001F4AC\ncolorFrom: green\ncolorTo: blue\nsdk: static\npinned: false\n---\n' > README.md
           git add -A
           git diff --cached --quiet || {
             git commit -m "auto-deploy from GitHub Actions"
