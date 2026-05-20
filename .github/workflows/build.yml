@@ -42,7 +42,7 @@ jobs:
       - name: Build APK
         run: flutter build apk --release
         env:
-          KEYSTORE_PATH: android/app/keystore.jks
+          KEYSTORE_PATH: keystore.jks
           KEYSTORE_PASSWORD: chato123
           KEY_ALIAS: chato
           KEY_PASSWORD: chato123
