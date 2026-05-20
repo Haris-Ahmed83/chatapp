@@ -12,20 +12,20 @@ class AppConfig {
 
   static Future<void> init() async {
     try {
-      if (Firebase.apps.isEmpty) {
-        await Firebase.initializeApp(
-          options: FirebaseOptions(
-            apiKey: "AIzaSyB4HeD05C8qE5EJRqWmtGcBD46iAHQr8ZU",
-            authDomain: "chatapp-8a2d9.firebaseapp.com",
-            projectId: "chatapp-8a2d9",
-            storageBucket: "chatapp-8a2d9.firebasestorage.app",
-            messagingSenderId: "594203207025",
-            appId: "1:594203207025:web:498329a15816fe98bdc2d0",
-            measurementId: "G-5XBZE8Z4X6",
-          ),
-        );
-      }
-    } catch (_) {}
+      await Firebase.initializeApp(
+        options: FirebaseOptions(
+          apiKey: "AIzaSyB4HeD05C8qE5EJRqWmtGcBD46iAHQr8ZU",
+          authDomain: "chatapp-8a2d9.firebaseapp.com",
+          projectId: "chatapp-8a2d9",
+          storageBucket: "chatapp-8a2d9.firebasestorage.app",
+          messagingSenderId: "594203207025",
+          appId: "1:594203207025:web:498329a15816fe98bdc2d0",
+          measurementId: "G-5XBZE8Z4X6",
+        ),
+    );
+    } on FirebaseException catch (e) {
+      if (e.code != 'duplicate-app') rethrow;
+    }
     auth = FirebaseAuth.instance;
     firestore = FirebaseFirestore.instance;
     storage = FirebaseStorage.instance;
