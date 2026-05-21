@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:chato/src/features/contacts/controllers/contact_controller.dart';
 import 'package:chato/src/routing/app_routes.dart';

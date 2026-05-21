@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:chato/src/features/auth/controllers/auth_controller.dart';
+import 'package:chato/src/features/auth/screens/profile_setup_screen.dart';
 import 'package:chato/src/routing/app_routes.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -34,13 +35,28 @@ class SettingsScreen extends StatelessWidget {
           }),
           const Divider(height: 1),
           const SizedBox(height: 8),
-          _buildItem(Icons.key, 'Account', 'Privacy, security, change number'),
-          _buildItem(Icons.chat_bubble_outline, 'Chats', 'Theme, wallpapers, chat history'),
-          _buildItem(Icons.notifications_outlined, 'Notifications', 'Message and group notifications'),
-          _buildItem(Icons.storage_outlined, 'Storage and data', 'Network usage, auto-download'),
+          _buildItem(
+            Icons.key, 'Account', 'Privacy, security, change number',
+            () => Get.toNamed(AppRoutes.profileSetup),
+          ),
+          _buildItem(
+            Icons.chat_bubble_outline, 'Chats', 'Theme, wallpapers, chat history',
+            _showComingSoon,
+          ),
+          _buildItem(
+            Icons.notifications_outlined, 'Notifications', 'Message and group notifications',
+            _showComingSoon,
+          ),
+          _buildItem(
+            Icons.storage_outlined, 'Storage and data', 'Network usage, auto-download',
+            _showComingSoon,
+          ),
           const Divider(height: 1),
           const SizedBox(height: 8),
-          _buildItem(Icons.info_outline, 'About and help', ''),
+          _buildItem(
+            Icons.info_outline, 'About and help', '',
+            _showAbout,
+          ),
           Obx(() {
             return ListTile(
               leading: Container(
@@ -64,7 +80,7 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildItem(IconData icon, String title, String subtitle) {
+  Widget _buildItem(IconData icon, String title, String subtitle, VoidCallback? onTap) {
     return ListTile(
       leading: Container(
         width: 40,
@@ -78,7 +94,24 @@ class SettingsScreen extends StatelessWidget {
       title: Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
       subtitle: subtitle.isNotEmpty ? Text(subtitle, style: TextStyle(fontSize: 13, color: Colors.grey[600])) : null,
       trailing: const Icon(Icons.chevron_right, color: Colors.grey),
-      onTap: () {},
+      onTap: onTap ?? () {},
+    );
+  }
+
+  void _showComingSoon() {
+    Get.snackbar('Coming soon', 'This feature is not yet available',
+      snackPosition: SnackPosition.BOTTOM,
+      duration: const Duration(seconds: 2),
+    );
+  }
+
+  void _showAbout() {
+    Get.defaultDialog(
+      title: 'Chato',
+      middleText: 'Version 1.0.0\n\nA WhatsApp clone built with Flutter & Firebase.',
+      textConfirm: 'OK',
+      confirmTextColor: Colors.white,
+      buttonColor: const Color(0xFF075E54),
     );
   }
 }

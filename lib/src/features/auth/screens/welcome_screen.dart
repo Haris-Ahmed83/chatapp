@@ -1,9 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:chato/src/config/app_config.dart';
+import 'package:chato/src/features/auth/controllers/auth_controller.dart';
 import 'package:chato/src/routing/app_routes.dart';
 
-class WelcomeScreen extends StatelessWidget {
+class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
+
+  @override
+  State<WelcomeScreen> createState() => _WelcomeScreenState();
+}
+
+class _WelcomeScreenState extends State<WelcomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    _checkLoggedIn();
+  }
+
+  void _checkLoggedIn() {
+    final user = AppConfig.auth.currentUser;
+    if (user != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Get.find<AuthController>().checkProfile();
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

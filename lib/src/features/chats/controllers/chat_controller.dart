@@ -20,6 +20,17 @@ class ChatController extends GetxController {
       chats.value = snapshot.docs.map((doc) {
         final data = doc.data();
         data['id'] = doc.id;
+        final names = data['participant_names'] as Map<String, dynamic>? ?? {};
+        String displayName = 'Unknown';
+        String otherPhone = '';
+        names.forEach((key, value) {
+          if (key != uid) {
+            displayName = value is String ? value : displayName;
+            otherPhone = key;
+          }
+        });
+        data['name'] = displayName;
+        data['other_phone'] = otherPhone;
         return data;
       }).toList();
     });

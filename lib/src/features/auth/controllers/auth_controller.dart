@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -45,8 +46,8 @@ class AuthController extends GetxController {
         verificationCompleted: (credential) async {
           try {
             await AppConfig.auth.signInWithCredential(credential);
-            await _checkProfile();
-          } catch (e) {
+          await checkProfile();
+        } catch (e) {
             Get.snackbar('Error', '$e', snackPosition: SnackPosition.BOTTOM, duration: const Duration(seconds: 5));
           }
         },
@@ -77,7 +78,7 @@ class AuthController extends GetxController {
         smsCode: code,
       );
       await AppConfig.auth.signInWithCredential(credential);
-      await _checkProfile();
+      await checkProfile();
     } catch (e) {
       Get.snackbar('Invalid code', 'Please try again');
     } finally {
@@ -85,7 +86,7 @@ class AuthController extends GetxController {
     }
   }
 
-  Future<void> _checkProfile() async {
+  Future<void> checkProfile() async {
     final user = AppConfig.auth.currentUser;
     if (user == null) return;
 
@@ -121,10 +122,26 @@ class AuthController extends GetxController {
   Future<void> saveProfile(String name) async {
     isLoading.value = true;
     try {
-      final uid = AppConfig.auth.currentUser?.uid;
-      if (uid == null) {
+      final user = AppConfig.auth.currentUser;
+      if (user == null) {
         Get.snackbar('Error', 'User not signed in. Please try again.');
         return;
+      }
+      final uid = user.uid;
+
+      String finalPhotoUrl = photoUrl.value;
+      if (finalPhotoUrl.isNotEmpty && !finalPhotoUrl.startsWith('http')) {
+        try {
+          final file = File(finalPhotoUrl);
+          if (await file.exists()) {
+            final ref = AppConfig.storage.ref('profiles/$uid/photo.jpg');
+            await ref.putData(await file.readAsBytes());
+            finalPhotoUrl = await ref.getDownloadURL();
+            photoUrl.value = finalPhotoUrl;
+          }
+        } catch (e) {
+          finalPhotoUrl = '';
+        }
       }
 
       try {
@@ -132,20 +149,25 @@ class AuthController extends GetxController {
           'uid': uid,
           'phone': phone.value,
           'display_name': name,
-          'photo_url': photoUrl.value,
+          'photo_url': finalPhotoUrl,
           'status': status.value,
           'last_seen': FieldValue.serverTimestamp(),
         }, SetOptions(merge: true));
       } catch (e) {
-        await AppConfig.auth.currentUser?.updateDisplayName(name);
-        await AppConfig.auth.currentUser?.reload();
+        try {
+          await user.updateDisplayName(name);
+          await user.reload();
+        } catch (e2) {
+          Get.snackbar('Error', 'Failed: $e2', snackPosition: SnackPosition.BOTTOM, duration: const Duration(seconds: 5));
+          return;
+        }
       }
 
       displayName.value = name;
       isProfileComplete.value = true;
       Get.offAllNamed(AppRoutes.home);
     } catch (e) {
-      Get.snackbar('Error', 'Failed to save profile: $e');
+      Get.snackbar('Error', 'Failed to save profile: $e', snackPosition: SnackPosition.BOTTOM, duration: const Duration(seconds: 5));
     } finally {
       isLoading.value = false;
     }

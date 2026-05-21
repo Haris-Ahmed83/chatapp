@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -44,16 +45,23 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
             const SizedBox(height: 32),
             GestureDetector(
               onTap: _pickPhoto,
-              child: Obx(() => CircleAvatar(
-                radius: 56,
-                backgroundColor: const Color(0xFF075E54),
-                backgroundImage: auth.photoUrl.value.isNotEmpty && auth.photoUrl.value.startsWith('http')
-                    ? NetworkImage(auth.photoUrl.value)
-                    : null,
-                child: auth.photoUrl.value.isEmpty || !auth.photoUrl.value.startsWith('http')
-                    ? const Icon(Icons.camera_alt, size: 32, color: Colors.white)
-                    : null,
-              )),
+              child: Obx(() {
+                final photo = auth.photoUrl.value;
+                ImageProvider? image;
+                if (photo.startsWith('http')) {
+                  image = NetworkImage(photo);
+                } else if (photo.isNotEmpty) {
+                  image = FileImage(File(photo));
+                }
+                return CircleAvatar(
+                  radius: 56,
+                  backgroundColor: const Color(0xFF075E54),
+                  backgroundImage: image,
+                  child: image == null
+                      ? const Icon(Icons.camera_alt, size: 32, color: Colors.white)
+                      : null,
+                );
+              }),
             ),
             const SizedBox(height: 16),
             const Text('Add profile photo', style: TextStyle(color: Color(0xFF075E54))),
