@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:chato/src/features/chats/controllers/chat_controller.dart';
+import 'package:chato/src/routing/app_routes.dart';
 import 'package:chato/src/config/app_config.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -81,7 +82,10 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.call, color: Colors.white),
-            onPressed: () {},
+            onPressed: () => Get.toNamed(AppRoutes.call, arguments: {
+              'name': chatName,
+              'other_uid': args?['other_uid'] ?? '',
+            }),
           ),
           PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert, color: Colors.white),
