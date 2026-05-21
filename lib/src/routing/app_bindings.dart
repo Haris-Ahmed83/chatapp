@@ -8,7 +8,7 @@ import 'package:chato/src/features/status/controllers/status_controller.dart';
 class AppBindings extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<AuthController>(() => AuthController());
+    Get.put<AuthController>(AuthController(), permanent: true);
     Get.lazyPut<ChatController>(() => ChatController());
     Get.lazyPut<CallController>(() => CallController());
     Get.lazyPut<ContactController>(() => ContactController());

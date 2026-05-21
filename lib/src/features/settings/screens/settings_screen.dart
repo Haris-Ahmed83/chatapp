@@ -18,22 +18,20 @@ class SettingsScreen extends StatelessWidget {
       ),
       body: ListView(
         children: [
-          Obx(() => ListTile(
-            leading: CircleAvatar(
-              radius: 28,
-              backgroundColor: const Color(0xFF075E54),
-              child: Text(
-                (auth.displayName.value.isNotEmpty ? auth.displayName.value : '?')[0].toUpperCase(),
-                style: const TextStyle(color: Colors.white, fontSize: 24),
+          Obx(() {
+            final name = auth.displayName.value.isNotEmpty ? auth.displayName.value : 'Set your name';
+            final letter = name.isNotEmpty ? name[0].toUpperCase() : '?';
+            return ListTile(
+              leading: CircleAvatar(
+                radius: 28,
+                backgroundColor: const Color(0xFF075E54),
+                child: Text(letter, style: const TextStyle(color: Colors.white, fontSize: 24)),
               ),
-            ),
-            title: Text(
-              auth.displayName.value.isNotEmpty ? auth.displayName.value : 'Set your name',
-              style: const TextStyle(fontWeight: FontWeight.w500),
-            ),
-            subtitle: Text(auth.status.value),
-            trailing: const Icon(Icons.qr_code_scanner, color: Color(0xFF075E54)),
-          )),
+              title: Text(name, style: const TextStyle(fontWeight: FontWeight.w500)),
+              subtitle: Text(auth.status.value),
+              trailing: const Icon(Icons.qr_code_scanner, color: Color(0xFF075E54)),
+            );
+          }),
           const Divider(height: 1),
           const SizedBox(height: 8),
           _buildItem(Icons.key, 'Account', 'Privacy, security, change number'),
@@ -43,22 +41,24 @@ class SettingsScreen extends StatelessWidget {
           const Divider(height: 1),
           const SizedBox(height: 8),
           _buildItem(Icons.info_outline, 'About and help', ''),
-          Obx(() => ListTile(
-            leading: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: Colors.red.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
+          Obx(() {
+            return ListTile(
+              leading: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Colors.red.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.logout, color: Colors.red),
               ),
-              child: const Icon(Icons.logout, color: Colors.red),
-            ),
-            title: const Text('Log out', style: TextStyle(color: Colors.red)),
-            onTap: () async {
-              await auth.signOut();
-              Get.offAllNamed(AppRoutes.welcome);
-            },
-          )),
+              title: const Text('Log out', style: TextStyle(color: Colors.red)),
+              onTap: () async {
+                await auth.signOut();
+                Get.offAllNamed(AppRoutes.welcome);
+              },
+            );
+          }),
         ],
       ),
     );

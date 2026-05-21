@@ -1,15 +1,18 @@
 import 'package:get/get.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_contacts/flutter_contacts.dart' as fc;
 
 class ContactController extends GetxController {
   final contacts = <Map<String, String>>[].obs;
   final loading = false.obs;
+  final permissionGranted = false.obs;
 
   Future<void> loadContacts() async {
     loading.value = true;
     try {
-      final granted = await fc.FlutterContacts.requestPermission(readonly: true);
-      if (granted) {
+      final status = await Permission.contacts.request();
+      if (status.isGranted) {
+        permissionGranted.value = true;
         final raw = await fc.FlutterContacts.getContacts(
           withProperties: true,
           withThumbnail: false,
@@ -22,7 +25,8 @@ class ContactController extends GetxController {
           };
         }).where((c) => c['phone']!.isNotEmpty).toList();
       } else {
-        Get.snackbar('Permission denied', 'Contacts permission is required to show contacts');
+        permissionGranted.value = false;
+        Get.snackbar('Permission denied', 'Contacts access is required. Enable it in Settings.');
       }
     } catch (e) {
       Get.snackbar('Error', 'Failed to load contacts: $e');
