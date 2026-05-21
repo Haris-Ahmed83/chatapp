@@ -15,6 +15,15 @@ subprojects {
 subprojects {
     project.evaluationDependsOn(":app")
 }
+subprojects {
+    configurations.all {
+        resolutionStrategy {
+            force("org.jetbrains.kotlin:kotlin-stdlib:2.0.21")
+            force("org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.0.21")
+            force("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.21")
+        }
+    }
+}
 
 tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
