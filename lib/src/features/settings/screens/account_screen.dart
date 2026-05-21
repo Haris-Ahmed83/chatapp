@@ -3,7 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:chato/src/features/auth/controllers/auth_controller.dart';
-import 'package:chato/src/config/app_config.dart';
+import 'package:chato/src/features/settings/screens/privacy_screen.dart';
+import 'package:chato/src/features/settings/screens/security_screen.dart';
+import 'package:chato/src/features/settings/screens/change_number_screen.dart';
+import 'package:chato/src/features/settings/screens/request_info_screen.dart';
+import 'package:chato/src/features/settings/screens/delete_account_screen.dart';
 
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
@@ -35,11 +39,16 @@ class AccountScreen extends StatelessWidget {
             );
           }),
           ...[
-            _item(Icons.lock_outline, 'Privacy', 'Last seen, profile photo, about'),
-            _item(Icons.security, 'Security', 'Two-step verification'),
-            _item(Icons.phone_android, 'Change number', 'Change your phone number'),
-            _item(Icons.folder_outlined, 'Request account info', ''),
-            _item(Icons.delete_outline, 'Delete my account', ''),
+            _item(Icons.lock_outline, 'Privacy', 'Last seen, profile photo, about',
+              () => Get.to(() => const PrivacyScreen())),
+            _item(Icons.security, 'Security', 'Two-step verification',
+              () => Get.to(() => const SecurityScreen())),
+            _item(Icons.phone_android, 'Change number', 'Change your phone number',
+              () => Get.to(() => const ChangeNumberScreen())),
+            _item(Icons.folder_outlined, 'Request account info', '',
+              () => Get.to(() => const RequestInfoScreen())),
+            _item(Icons.delete_outline, 'Delete my account', '',
+              () => Get.to(() => const DeleteAccountScreen())),
           ],
         ],
       ),
