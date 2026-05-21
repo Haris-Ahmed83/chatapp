@@ -86,11 +86,11 @@ class AuthController extends GetxController {
   }
 
   Future<void> _checkProfile() async {
-    final uid = AppConfig.auth.currentUser?.uid;
-    if (uid == null) return;
+    final user = AppConfig.auth.currentUser;
+    if (user == null) return;
 
     try {
-      final doc = await AppConfig.firestore.collection('profiles').doc(uid).get();
+      final doc = await AppConfig.firestore.collection('profiles').doc(user.uid).get();
       final data = doc.data();
       if (doc.exists && data != null && data['display_name'] != null) {
         displayName.value = data['display_name'] as String;
@@ -98,13 +98,23 @@ class AuthController extends GetxController {
         status.value = (data['status'] as String?) ?? 'Hey there! I am using Chato';
         isProfileComplete.value = true;
         Get.offAllNamed(AppRoutes.home);
+      } else if (user.displayName != null && user.displayName!.isNotEmpty) {
+        displayName.value = user.displayName!;
+        isProfileComplete.value = true;
+        Get.offAllNamed(AppRoutes.home);
       } else {
         isProfileComplete.value = false;
         Get.toNamed(AppRoutes.profileSetup);
       }
     } catch (e) {
-      isProfileComplete.value = false;
-      Get.toNamed(AppRoutes.profileSetup);
+      if (user.displayName != null && user.displayName!.isNotEmpty) {
+        displayName.value = user.displayName!;
+        isProfileComplete.value = true;
+        Get.offAllNamed(AppRoutes.home);
+      } else {
+        isProfileComplete.value = false;
+        Get.toNamed(AppRoutes.profileSetup);
+      }
     }
   }
 
@@ -117,23 +127,25 @@ class AuthController extends GetxController {
         return;
       }
 
-      await AppConfig.firestore.collection('profiles').doc(uid).set({
-        'uid': uid,
-        'phone': phone.value,
-        'display_name': name,
-        'photo_url': photoUrl.value,
-        'status': status.value,
-        'last_seen': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
+      try {
+        await AppConfig.firestore.collection('profiles').doc(uid).set({
+          'uid': uid,
+          'phone': phone.value,
+          'display_name': name,
+          'photo_url': photoUrl.value,
+          'status': status.value,
+          'last_seen': FieldValue.serverTimestamp(),
+        }, SetOptions(merge: true));
+      } catch (e) {
+        await AppConfig.auth.currentUser?.updateDisplayName(name);
+        await AppConfig.auth.currentUser?.reload();
+      }
 
       displayName.value = name;
       isProfileComplete.value = true;
       Get.offAllNamed(AppRoutes.home);
     } catch (e) {
-      Get.snackbar('Firestore Error', 'Failed to save profile.\nCheck Firebase Console → Firestore → Rules\nSet: allow read, write: if request.auth != null;\n\nError: $e',
-        snackPosition: SnackPosition.BOTTOM,
-        duration: const Duration(seconds: 10),
-      );
+      Get.snackbar('Error', 'Failed to save profile: $e');
     } finally {
       isLoading.value = false;
     }
