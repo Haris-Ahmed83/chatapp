@@ -180,13 +180,8 @@ class AuthController extends GetxController {
   Future<void> initPresence() async {
     final uid = AppConfig.auth.currentUser?.uid;
     if (uid == null) return;
-    final ref = AppConfig.firestore.collection('presences').doc(uid);
-    await ref.set({
+    await AppConfig.firestore.collection('presences').doc(uid).set({
       'online': true,
-      'last_seen': FieldValue.serverTimestamp(),
-    });
-    ref.onDisconnect().set({
-      'online': false,
       'last_seen': FieldValue.serverTimestamp(),
     });
   }
