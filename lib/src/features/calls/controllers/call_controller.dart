@@ -37,7 +37,7 @@ class CallController extends GetxController {
       );
 
       _audioTrack = await LocalAudioTrack.create();
-      await room.localParticipant?.publishTrack(_audioTrack!);
+      await room.localParticipant?.publishAudioTrack(_audioTrack!);
       isInCall.value = true;
     } catch (e) {
       isInCall.value = true;
@@ -50,7 +50,11 @@ class CallController extends GetxController {
 
   void toggleMute() {
     if (_audioTrack != null) {
-      _audioTrack!.enabled = isMuted.value;
+      if (isMuted.value) {
+        _audioTrack?.unmute();
+      } else {
+        _audioTrack?.mute();
+      }
     }
     isMuted.toggle();
   }

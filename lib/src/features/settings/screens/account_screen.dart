@@ -55,7 +55,7 @@ class AccountScreen extends StatelessWidget {
     );
   }
 
-  Widget _item(IconData icon, String title, String subtitle) {
+  Widget _item(IconData icon, String title, String subtitle, VoidCallback onTap) {
     return ListTile(
       leading: Container(
         width: 40, height: 40,
@@ -68,10 +68,7 @@ class AccountScreen extends StatelessWidget {
       title: Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
       subtitle: subtitle.isNotEmpty ? Text(subtitle, style: TextStyle(fontSize: 13, color: Colors.grey[600])) : null,
       trailing: const Icon(Icons.chevron_right, color: Colors.grey),
-      onTap: () => Get.snackbar(title, subtitle.isEmpty ? 'Not yet available' : subtitle,
-        snackPosition: SnackPosition.BOTTOM,
-        duration: const Duration(seconds: 2),
-      ),
+      onTap: onTap,
     );
   }
 
