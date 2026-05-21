@@ -18,24 +18,39 @@ class ChatController extends GetxController {
         .orderBy('last_message_time', descending: true)
         .snapshots()
         .listen((snapshot) {
-      chats.value = snapshot.docs.map((doc) {
-        final data = doc.data();
-        data['id'] = doc.id;
-        final participants = (data['participants'] as List<dynamic>?) ?? [];
-        final names = (data['participant_names'] as Map<String, dynamic>?) ?? {};
-        String displayName = 'Unknown';
-        String otherUid = '';
-        for (final p in participants) {
-          if (p != uid) {
-            otherUid = p as String;
-            displayName = names[p] as String? ?? displayName;
-          }
-        }
-        data['name'] = displayName;
-        data['other_uid'] = otherUid;
-        return data;
-      }).toList();
+      _processChats(snapshot, uid);
     });
+  }
+
+  Future<void> _processChats(QuerySnapshot snapshot, String uid) async {
+    final results = <Map<String, dynamic>>[];
+    for (final doc in snapshot.docs) {
+      final data = doc.data() as Map<String, dynamic>;
+      data['id'] = doc.id;
+      final participants = (data['participants'] as List<dynamic>?) ?? [];
+      final names = (data['participant_names'] as Map<String, dynamic>?) ?? {};
+      String displayName = 'Unknown';
+      String otherUid = '';
+      for (final p in participants) {
+        if (p != uid) {
+          otherUid = p as String;
+          displayName = names[p] as String? ?? displayName;
+        }
+      }
+      if (displayName == 'Unknown' && otherUid.isNotEmpty) {
+        try {
+          final profileDoc = await AppConfig.firestore.collection('profiles').doc(otherUid).get();
+          final profileData = profileDoc.data();
+          if (profileData != null && profileData['display_name'] != null) {
+            displayName = profileData['display_name'] as String;
+          }
+        } catch (_) {}
+      }
+      data['name'] = displayName;
+      data['other_uid'] = otherUid;
+      results.add(data);
+    }
+    chats.value = results;
   }
 
   void loadMessages(String conversationId) {
