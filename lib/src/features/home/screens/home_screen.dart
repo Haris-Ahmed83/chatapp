@@ -7,6 +7,7 @@ import 'package:chato/src/features/calls/screens/calls_screen.dart';
 import 'package:chato/src/features/contacts/controllers/contact_controller.dart';
 import 'package:chato/src/features/status/controllers/status_controller.dart';
 import 'package:chato/src/features/auth/controllers/auth_controller.dart';
+import 'package:chato/src/features/chats/controllers/chat_controller.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -18,6 +19,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   int _currentTab = 0;
+  bool _isSearching = false;
+  final _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -25,7 +28,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     _tabController = TabController(length: 3, vsync: this);
     _tabController.addListener(() {
       if (!_tabController.indexIsChanging) {
-        setState(() => _currentTab = _tabController.index);
+        setState(() {
+          _currentTab = _tabController.index;
+          _isSearching = false;
+          _searchController.clear();
+        });
       }
     });
     Get.find<ContactController>().loadContacts();
@@ -35,19 +42,48 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   @override
   void dispose() {
     _tabController.dispose();
+    _searchController.dispose();
     super.dispose();
+  }
+
+  void _onSearchChanged(String value) {
+    Get.find<ChatController>().searchQuery.value = value;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('WhatsApp'),
+        title: _isSearching
+            ? TextField(
+                controller: _searchController,
+                autofocus: true,
+                onChanged: _onSearchChanged,
+                style: const TextStyle(color: Colors.white),
+                decoration: const InputDecoration(
+                  hintText: 'Search chats...',
+                  hintStyle: TextStyle(color: Colors.white60),
+                  border: InputBorder.none,
+                ),
+              )
+            : const Text('WhatsApp'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.search, color: Colors.white),
-            onPressed: () {},
-          ),
+          if (_currentTab == 0)
+            _isSearching
+                ? IconButton(
+                    icon: const Icon(Icons.close, color: Colors.white),
+                    onPressed: () {
+                      setState(() {
+                        _isSearching = false;
+                        _searchController.clear();
+                        Get.find<ChatController>().searchQuery.value = '';
+                      });
+                    },
+                  )
+                : IconButton(
+                    icon: const Icon(Icons.search, color: Colors.white),
+                    onPressed: () => setState(() => _isSearching = true),
+                  ),
           PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert, color: Colors.white),
             onSelected: (value) {

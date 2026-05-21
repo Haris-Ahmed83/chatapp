@@ -6,6 +6,7 @@ class ChatController extends GetxController {
   final chats = <Map<String, dynamic>>[].obs;
   final messages = <Map<String, dynamic>>[].obs;
   final currentChatId = ''.obs;
+  final searchQuery = ''.obs;
 
   void loadChats() {
     final uid = AppConfig.auth.currentUser?.uid;
