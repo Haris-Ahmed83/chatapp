@@ -12,5 +12,6 @@ class AppRoutes {
   static const notifications = '/notifications';
   static const storageSettings = '/storage-settings';
   static const about = '/about';
+  static const qrCode = '/qr-code';
   static const contactPicker = '/contact-picker';
 }

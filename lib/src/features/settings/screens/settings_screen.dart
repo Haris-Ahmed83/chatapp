@@ -7,6 +7,7 @@ import 'package:chato/src/features/settings/screens/chats_settings_screen.dart';
 import 'package:chato/src/features/settings/screens/notifications_screen.dart';
 import 'package:chato/src/features/settings/screens/storage_screen.dart';
 import 'package:chato/src/features/settings/screens/about_screen.dart';
+import 'package:chato/src/features/settings/screens/qr_code_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -34,7 +35,10 @@ class SettingsScreen extends StatelessWidget {
               ),
               title: Text(name, style: const TextStyle(fontWeight: FontWeight.w500)),
               subtitle: Text(auth.status.value),
-              trailing: const Icon(Icons.qr_code_scanner, color: Color(0xFF075E54)),
+              trailing: IconButton(
+                icon: const Icon(Icons.qr_code_scanner, color: Color(0xFF075E54)),
+                onPressed: () => Get.to(() => const QrCodeScreen()),
+              ),
               onTap: () => Get.to(() => AccountScreen()),
             );
           }),
