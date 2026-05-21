@@ -40,7 +40,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('WhatsApp do'),
+        title: const Text('WhatsApp'),
         actions: [
           IconButton(
             icon: const Icon(Icons.search, color: Colors.white),

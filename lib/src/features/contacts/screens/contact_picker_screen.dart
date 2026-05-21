@@ -31,7 +31,7 @@ class ContactPickerScreen extends StatelessWidget {
                 SizedBox(height: 16),
                 Text('No contacts with this app', style: TextStyle(color: Colors.grey)),
                 SizedBox(height: 8),
-                Text('Invite friends to WhatsApp do!', style: TextStyle(fontSize: 13, color: Colors.grey)),
+                Text('Invite friends to WhatsApp!', style: TextStyle(fontSize: 13, color: Colors.grey)),
               ],
             ),
           );

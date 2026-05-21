@@ -20,7 +20,7 @@ class AboutScreen extends StatelessWidget {
               children: [
                 const Icon(Icons.chat_bubble_outline, size: 64, color: Color(0xFF075E54)),
                 const SizedBox(height: 8),
-                const Text('WhatsApp do', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
+                const Text('WhatsApp', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 4),
                 Text('Version 1.0.0', style: TextStyle(color: Colors.grey[600])),
               ],
