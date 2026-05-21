@@ -7,5 +7,10 @@ class AppRoutes {
   static const chat = '/chat';
   static const call = '/call';
   static const settings = '/settings';
+  static const account = '/account';
+  static const chatsSettings = '/chats-settings';
+  static const notifications = '/notifications';
+  static const storageSettings = '/storage-settings';
+  static const about = '/about';
   static const contactPicker = '/contact-picker';
 }

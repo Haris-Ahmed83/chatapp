@@ -98,10 +98,12 @@ class AuthController extends GetxController {
         photoUrl.value = (data['photo_url'] as String?) ?? '';
         status.value = (data['status'] as String?) ?? 'Hey there! I am using Chato';
         isProfileComplete.value = true;
+        initPresence();
         Get.offAllNamed(AppRoutes.home);
       } else if (user.displayName != null && user.displayName!.isNotEmpty) {
         displayName.value = user.displayName!;
         isProfileComplete.value = true;
+        initPresence();
         Get.offAllNamed(AppRoutes.home);
       } else {
         isProfileComplete.value = false;
@@ -111,6 +113,7 @@ class AuthController extends GetxController {
       if (user.displayName != null && user.displayName!.isNotEmpty) {
         displayName.value = user.displayName!;
         isProfileComplete.value = true;
+        initPresence();
         Get.offAllNamed(AppRoutes.home);
       } else {
         isProfileComplete.value = false;
@@ -165,6 +168,7 @@ class AuthController extends GetxController {
 
       displayName.value = name;
       isProfileComplete.value = true;
+      initPresence();
       Get.offAllNamed(AppRoutes.home);
     } catch (e) {
       Get.snackbar('Error', 'Failed to save profile: $e', snackPosition: SnackPosition.BOTTOM, duration: const Duration(seconds: 5));
@@ -173,7 +177,28 @@ class AuthController extends GetxController {
     }
   }
 
+  Future<void> initPresence() async {
+    final uid = AppConfig.auth.currentUser?.uid;
+    if (uid == null) return;
+    final ref = AppConfig.firestore.collection('presences').doc(uid);
+    await ref.set({
+      'online': true,
+      'last_seen': FieldValue.serverTimestamp(),
+    });
+    ref.onDisconnect().set({
+      'online': false,
+      'last_seen': FieldValue.serverTimestamp(),
+    });
+  }
+
   Future<void> signOut() async {
+    final uid = AppConfig.auth.currentUser?.uid;
+    if (uid != null) {
+      await AppConfig.firestore.collection('presences').doc(uid).set({
+        'online': false,
+        'last_seen': FieldValue.serverTimestamp(),
+      });
+    }
     await AppConfig.auth.signOut();
     isProfileComplete.value = false;
     phone.value = '';

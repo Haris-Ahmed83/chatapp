@@ -31,15 +31,23 @@ class StatusController extends GetxController {
     });
   }
 
-  Future<void> pickAndUploadStatus() async {
+  Future<void> pickAndUploadStatus({bool useCamera = false}) async {
     final photoPermission = await Permission.photos.request();
-    if (!photoPermission.isGranted) {
-      Get.snackbar('Permission denied', 'Gallery permission is required to upload status');
+    if (!photoPermission.isGranted && !useCamera) {
+      Get.snackbar('Permission denied', 'Gallery permission is required');
+      return;
+    }
+
+    final cameraPermission = await Permission.camera.request();
+    if (!cameraPermission.isGranted && useCamera) {
+      Get.snackbar('Permission denied', 'Camera permission is required');
       return;
     }
 
     final picker = ImagePicker();
-    final file = await picker.pickImage(source: ImageSource.gallery);
+    final file = await picker.pickImage(
+      source: useCamera ? ImageSource.camera : ImageSource.gallery,
+    );
     if (file == null) return;
 
     uploading.value = true;

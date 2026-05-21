@@ -11,7 +11,7 @@ class ChatoApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      title: 'Chato',
+      title: 'WhatsApp do',
       debugShowCheckedModeBanner: false,
       theme: waTheme,
       initialRoute: AppRoutes.welcome,

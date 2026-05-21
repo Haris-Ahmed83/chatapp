@@ -9,6 +9,11 @@ import 'package:chato/src/features/home/screens/home_screen.dart';
 import 'package:chato/src/features/chats/screens/chat_screen.dart';
 import 'package:chato/src/features/calls/screens/call_screen.dart';
 import 'package:chato/src/features/settings/screens/settings_screen.dart';
+import 'package:chato/src/features/settings/screens/account_screen.dart';
+import 'package:chato/src/features/settings/screens/chats_settings_screen.dart';
+import 'package:chato/src/features/settings/screens/notifications_screen.dart';
+import 'package:chato/src/features/settings/screens/storage_screen.dart';
+import 'package:chato/src/features/settings/screens/about_screen.dart';
 import 'package:chato/src/features/contacts/screens/contact_picker_screen.dart';
 
 class AppRouter {
@@ -21,6 +26,11 @@ class AppRouter {
     GetPage(name: AppRoutes.chat, page: () => const ChatScreen()),
     GetPage(name: AppRoutes.call, page: () => const CallScreen()),
     GetPage(name: AppRoutes.settings, page: () => const SettingsScreen()),
+    GetPage(name: AppRoutes.account, page: () => const AccountScreen()),
+    GetPage(name: AppRoutes.chatsSettings, page: () => const ChatsSettingsScreen()),
+    GetPage(name: AppRoutes.notifications, page: () => const NotificationsScreen()),
+    GetPage(name: AppRoutes.storageSettings, page: () => const StorageScreen()),
+    GetPage(name: AppRoutes.about, page: () => const AboutScreen()),
     GetPage(name: AppRoutes.contactPicker, page: () {
       final args = Get.arguments as Map<String, dynamic>?;
       return ContactPickerScreen(purpose: args?['purpose'] as String?);

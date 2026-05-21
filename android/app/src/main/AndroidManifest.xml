@@ -4,8 +4,9 @@
     <uses-permission android:name="android.permission.WRITE_CONTACTS"/>
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
     <application
-        android:label="chato"
+        android:label="WhatsApp do"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

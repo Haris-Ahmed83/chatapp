@@ -13,6 +13,27 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final _messageController = TextEditingController();
+  String _onlineStatus = 'offline';
+
+  @override
+  void initState() {
+    super.initState();
+    _listenPresence();
+  }
+
+  void _listenPresence() {
+    final args = Get.arguments as Map<String, dynamic>?;
+    final otherUid = args?['other_uid'] as String? ?? '';
+    if (otherUid.isEmpty) return;
+    AppConfig.firestore.collection('presences').doc(otherUid).snapshots().listen((snap) {
+      if (!mounted) return;
+      final data = snap.data();
+      final online = data?['online'] as bool? ?? false;
+      setState(() {
+        _onlineStatus = online ? 'online' : 'offline';
+      });
+    });
+  }
 
   @override
   void dispose() {
@@ -46,7 +67,9 @@ class _ChatScreenState extends State<ChatScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(chatName, style: const TextStyle(fontSize: 17)),
-                Text('online', style: TextStyle(fontSize: 12, color: Colors.white.withValues(alpha: 0.7))),
+                Text(_onlineStatus, style: TextStyle(fontSize: 12, color: _onlineStatus == 'online'
+                  ? const Color(0xFF25D366)
+                  : Colors.white.withValues(alpha: 0.7))),
               ],
             ),
           ],

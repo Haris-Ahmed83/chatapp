@@ -20,17 +20,18 @@ class ChatController extends GetxController {
       chats.value = snapshot.docs.map((doc) {
         final data = doc.data();
         data['id'] = doc.id;
-        final names = data['participant_names'] as Map<String, dynamic>? ?? {};
+        final participants = (data['participants'] as List<dynamic>?) ?? [];
+        final names = (data['participant_names'] as Map<String, dynamic>?) ?? {};
         String displayName = 'Unknown';
-        String otherPhone = '';
-        names.forEach((key, value) {
-          if (key != uid) {
-            displayName = value is String ? value : displayName;
-            otherPhone = key;
+        String otherUid = '';
+        for (final p in participants) {
+          if (p != uid) {
+            otherUid = p as String;
+            displayName = names[p] as String? ?? displayName;
           }
-        });
+        }
         data['name'] = displayName;
-        data['other_phone'] = otherPhone;
+        data['other_uid'] = otherUid;
         return data;
       }).toList();
     });
@@ -55,12 +56,26 @@ class ChatController extends GetxController {
     });
   }
 
-  Future<void> createConversation(String contactName, String contactPhone) async {
+  Future<void> createConversation(String contactName, String otherUid) async {
     final uid = AppConfig.auth.currentUser?.uid;
-    if (uid == null) return;
+    if (uid == null || otherUid.isEmpty) return;
+
+    final existing = await AppConfig.firestore
+        .collection('conversations')
+        .where('participants', arrayContains: uid)
+        .get();
+
+    for (final doc in existing.docs) {
+      final participants = doc.data()['participants'] as List<dynamic>? ?? [];
+      if (participants.contains(otherUid)) {
+        currentChatId.value = doc.id;
+        return;
+      }
+    }
+
     final doc = await AppConfig.firestore.collection('conversations').add({
-      'participants': [uid, contactPhone],
-      'participant_names': {uid: 'Me', contactPhone: contactName},
+      'participants': [uid, otherUid],
+      'participant_names': {uid: 'Me', otherUid: contactName},
       'created_at': FieldValue.serverTimestamp(),
       'last_message': '',
       'last_message_time': FieldValue.serverTimestamp(),

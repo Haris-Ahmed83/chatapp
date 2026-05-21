@@ -38,7 +38,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             const Icon(Icons.chat_bubble_outline, size: 80, color: Colors.white),
             const SizedBox(height: 16),
             const Text(
-              'Chato',
+              'WhatsApp do',
               style: TextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.w600,

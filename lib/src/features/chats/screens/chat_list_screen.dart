@@ -45,6 +45,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
           final name = chat['name'] ?? 'Unknown';
           final lastMsg = chat['last_message'] ?? '';
           final photo = chat['photo_url'] ?? '';
+          final otherUid = chat['other_uid'] ?? '';
 
           return ListTile(
             leading: CircleAvatar(
@@ -60,7 +61,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
             subtitle: Text(lastMsg, maxLines: 1, overflow: TextOverflow.ellipsis),
             onTap: () {
               Get.find<ChatController>().loadMessages(chat['id']);
-              Get.toNamed(AppRoutes.chat, arguments: {'name': name, 'id': chat['id']});
+              Get.toNamed(AppRoutes.chat, arguments: {'name': name, 'id': chat['id'], 'other_uid': otherUid});
             },
           );
         },
