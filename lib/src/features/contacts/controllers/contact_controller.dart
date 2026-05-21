@@ -61,4 +61,9 @@ class ContactController extends GetxController {
       loading.value = false;
     }
   }
+
+  String? getNameByUid(String uid) {
+    final match = contacts.firstWhereOrNull((c) => c['uid'] == uid);
+    return match?['name'];
+  }
 }

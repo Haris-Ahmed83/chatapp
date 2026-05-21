@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:chato/src/config/app_config.dart';
+import 'package:chato/src/features/contacts/controllers/contact_controller.dart';
 
 class ChatController extends GetxController {
   final chats = <Map<String, dynamic>>[].obs;
@@ -38,13 +39,18 @@ class ChatController extends GetxController {
         }
       }
       if (displayName == 'Unknown' && otherUid.isNotEmpty) {
-        try {
-          final profileDoc = await AppConfig.firestore.collection('profiles').doc(otherUid).get();
-          final profileData = profileDoc.data();
-          if (profileData != null && profileData['display_name'] != null) {
-            displayName = profileData['display_name'] as String;
-          }
-        } catch (_) {}
+        final contactFromDevice = Get.find<ContactController>().getNameByUid(otherUid);
+        if (contactFromDevice != null) {
+          displayName = contactFromDevice;
+        } else {
+          try {
+            final profileDoc = await AppConfig.firestore.collection('profiles').doc(otherUid).get();
+            final profileData = profileDoc.data();
+            if (profileData != null && profileData['display_name'] != null) {
+              displayName = profileData['display_name'] as String;
+            }
+          } catch (_) {}
+        }
       }
       data['name'] = displayName;
       data['other_uid'] = otherUid;
