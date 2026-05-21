@@ -74,6 +74,7 @@ jobs:
           path: build/app/outputs/flutter-apk/app-release.apk
 
       - name: Deploy to HF Space
+        continue-on-error: true
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
@@ -83,7 +84,9 @@ jobs:
           cd hf-space
           rm -rf *
           cp -r ../build/web/* .
-          rm -rf canvaskit
+          rm -rf canvaskit/ canvaskit
+          echo 'canvaskit/' >> .gitignore
+          echo '*.wasm' >> .gitignore
           echo '---' > README.md
           echo 'title: Chato' >> README.md
           echo -e 'emoji: \U0001F4AC' >> README.md
