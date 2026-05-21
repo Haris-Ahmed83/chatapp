@@ -13,5 +13,6 @@ class AppRoutes {
   static const storageSettings = '/storage-settings';
   static const about = '/about';
   static const qrCode = '/qr-code';
+  static const contactDetail = '/contact-detail';
   static const contactPicker = '/contact-picker';
 }

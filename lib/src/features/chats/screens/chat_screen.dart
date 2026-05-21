@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:record/record.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:chato/src/features/chats/controllers/chat_controller.dart';
 import 'package:chato/src/routing/app_routes.dart';
 import 'package:chato/src/config/app_config.dart';
+import 'dart:io';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -14,7 +17,11 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final _messageController = TextEditingController();
+  final _audioRecorder = AudioRecorder();
+  final _audioPlayer = AudioPlayer();
+  final _isRecording = false.obs;
   String _onlineStatus = 'offline';
+  String? _recordingPath;
 
   @override
   void initState() {
@@ -30,15 +37,62 @@ class _ChatScreenState extends State<ChatScreen> {
       if (!mounted) return;
       final data = snap.data();
       final online = data?['online'] as bool? ?? false;
-      setState(() {
-        _onlineStatus = online ? 'online' : 'offline';
-      });
+      setState(() => _onlineStatus = online ? 'online' : 'offline');
     });
+  }
+
+  Future<void> _startRecording() async {
+    try {
+      final path = '${Directory.systemTemp.path}/voice_${DateTime.now().millisecondsSinceEpoch}.m4a';
+      await _audioRecorder.start(
+        const RecordConfig(encoder: AudioEncoder.aacLc),
+        path: path,
+      );
+      _recordingPath = path;
+      _isRecording.value = true;
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to start recording: $e');
+    }
+  }
+
+  Future<void> _stopRecording(String chatId) async {
+    if (!_isRecording.value) return;
+    _isRecording.value = false;
+    try {
+      final path = await _audioRecorder.stop();
+      if (path == null) return;
+      final chatController = Get.find<ChatController>();
+      final uid = AppConfig.auth.currentUser?.uid ?? '';
+      final fileName = 'voice/$chatId/${DateTime.now().millisecondsSinceEpoch}.m4a';
+      final ref = AppConfig.storage.ref(fileName);
+      await ref.putFile(File(path));
+      final url = await ref.getDownloadURL();
+      final msgRef = AppConfig.firestore
+          .collection('conversations')
+          .doc(chatId)
+          .collection('messages')
+          .doc();
+      await msgRef.set({
+        'content': url,
+        'sender_id': uid,
+        'timestamp': FieldValue.serverTimestamp(),
+        'type': 'voice',
+      });
+      await AppConfig.firestore.collection('conversations').doc(chatId).update({
+        'last_message': 'Voice message',
+        'last_message_time': FieldValue.serverTimestamp(),
+        'last_sender_id': uid,
+      });
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to send voice: $e');
+    }
   }
 
   @override
   void dispose() {
     _messageController.dispose();
+    _audioRecorder.dispose();
+    _audioPlayer.dispose();
     super.dispose();
   }
 
@@ -78,7 +132,7 @@ class _ChatScreenState extends State<ChatScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.videocam, color: Colors.white),
-            onPressed: () {},
+            onPressed: () => Get.snackbar('Video call', 'Coming soon', snackPosition: SnackPosition.BOTTOM),
           ),
           IconButton(
             icon: const Icon(Icons.call, color: Colors.white),
@@ -89,9 +143,18 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
           PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert, color: Colors.white),
-            onSelected: (v) {},
+            onSelected: (v) {
+              if (v == 'view') {
+                Get.toNamed(AppRoutes.contactDetail, arguments: {
+                  'name': chatName,
+                  'other_uid': args?['other_uid'] ?? '',
+                });
+              }
+            },
             itemBuilder: (context) => [
               const PopupMenuItem(value: 'view', child: Text('View contact')),
+              const PopupMenuItem(value: 'media', child: Text('Media, links, and docs')),
+              const PopupMenuItem(value: 'search', child: Text('Search in chat')),
             ],
           ),
         ],
@@ -111,6 +174,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 itemBuilder: (context, index) {
                   final msg = msgs[index];
                   final isSent = msg['sender_id'] == userId;
+                  final type = msg['type'] as String? ?? 'text';
                   final content = msg['content'] as String? ?? '';
                   final ts = msg['timestamp'] as Timestamp?;
                   final time = ts != null
@@ -142,7 +206,10 @@ class _ChatScreenState extends State<ChatScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          Text(content, style: const TextStyle(fontSize: 15)),
+                          if (type == 'voice')
+                            _VoiceBubble(url: content)
+                          else
+                            Text(content, style: const TextStyle(fontSize: 15)),
                           const SizedBox(height: 2),
                           Row(
                             mainAxisSize: MainAxisSize.min,
@@ -150,7 +217,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               Text(time, style: TextStyle(fontSize: 11, color: Colors.grey[500])),
                               if (isSent) ...[
                                 const SizedBox(width: 4),
-                                Icon(Icons.done, size: 14, color: Colors.grey[500]),
+                                Icon(Icons.done_all, size: 14, color: Colors.grey[500]),
                               ],
                             ],
                           ),
@@ -187,10 +254,22 @@ class _ChatScreenState extends State<ChatScreen> {
                       ),
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.mic, color: Colors.grey),
-                    onPressed: () {},
-                  ),
+                  Obx(() {
+                    if (_isRecording.value) {
+                      return const Padding(
+                        padding: EdgeInsets.all(8),
+                        child: Icon(Icons.fiber_manual_record, color: Colors.red, size: 28),
+                      );
+                    }
+                    return GestureDetector(
+                      onLongPress: () => _startRecording(),
+                      onLongPressUp: () => _stopRecording(chatId),
+                      child: const Padding(
+                        padding: EdgeInsets.all(8),
+                        child: Icon(Icons.mic, color: Colors.grey, size: 28),
+                      ),
+                    );
+                  }),
                   IconButton(
                     icon: const Icon(Icons.send, color: Color(0xFF075E54)),
                     onPressed: () {
@@ -205,6 +284,53 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _VoiceBubble extends StatefulWidget {
+  final String url;
+  const _VoiceBubble({required this.url});
+
+  @override
+  State<_VoiceBubble> createState() => _VoiceBubbleState();
+}
+
+class _VoiceBubbleState extends State<_VoiceBubble> {
+  final _player = AudioPlayer();
+  bool _playing = false;
+  bool _loaded = false;
+
+  @override
+  void dispose() {
+    _player.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () async {
+        if (_playing) {
+          await _player.stop();
+          setState(() => _playing = false);
+        } else {
+          await _player.play(UrlSource(widget.url));
+          setState(() => _playing = true);
+          _player.onPlayerComplete.listen((_) {
+            if (mounted) setState(() => _playing = false);
+          });
+        }
+      },
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(_playing ? Icons.pause_circle_filled : Icons.play_circle_filled,
+            color: const Color(0xFF075E54), size: 28),
+          const SizedBox(width: 8),
+          const Text('Voice message', style: TextStyle(color: Color(0xFF075E54))),
         ],
       ),
     );

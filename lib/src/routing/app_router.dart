@@ -7,6 +7,7 @@ import 'package:chato/src/features/auth/screens/otp_screen.dart';
 import 'package:chato/src/features/auth/screens/profile_setup_screen.dart';
 import 'package:chato/src/features/home/screens/home_screen.dart';
 import 'package:chato/src/features/chats/screens/chat_screen.dart';
+import 'package:chato/src/features/chats/screens/contact_detail_screen.dart';
 import 'package:chato/src/features/calls/screens/call_screen.dart';
 import 'package:chato/src/features/settings/screens/settings_screen.dart';
 import 'package:chato/src/features/settings/screens/account_screen.dart';
@@ -33,6 +34,7 @@ class AppRouter {
     GetPage(name: AppRoutes.storageSettings, page: () => const StorageScreen()),
     GetPage(name: AppRoutes.about, page: () => const AboutScreen()),
     GetPage(name: AppRoutes.qrCode, page: () => const QrCodeScreen()),
+    GetPage(name: AppRoutes.contactDetail, page: () => const ContactDetailScreen()),
     GetPage(name: AppRoutes.contactPicker, page: () {
       final args = Get.arguments as Map<String, dynamic>?;
       return ContactPickerScreen(purpose: args?['purpose'] as String?);
