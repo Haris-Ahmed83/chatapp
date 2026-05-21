@@ -96,14 +96,12 @@ class AuthController extends GetxController {
       if (doc.exists && data != null && data['display_name'] != null) {
         displayName.value = data['display_name'] as String;
         photoUrl.value = (data['photo_url'] as String?) ?? '';
-        status.value = (data['status'] as String?) ?? 'Hey there! I am using Chato';
+        status.value = (data['status'] as String?) ?? 'Hey there! I am using WhatsApp';
         isProfileComplete.value = true;
-        initPresence();
         Get.offAllNamed(AppRoutes.home);
       } else if (user.displayName != null && user.displayName!.isNotEmpty) {
         displayName.value = user.displayName!;
         isProfileComplete.value = true;
-        initPresence();
         Get.offAllNamed(AppRoutes.home);
       } else {
         isProfileComplete.value = false;
@@ -113,7 +111,6 @@ class AuthController extends GetxController {
       if (user.displayName != null && user.displayName!.isNotEmpty) {
         displayName.value = user.displayName!;
         isProfileComplete.value = true;
-        initPresence();
         Get.offAllNamed(AppRoutes.home);
       } else {
         isProfileComplete.value = false;
@@ -168,7 +165,6 @@ class AuthController extends GetxController {
 
       displayName.value = name;
       isProfileComplete.value = true;
-      initPresence();
       Get.offAllNamed(AppRoutes.home);
     } catch (e) {
       Get.snackbar('Error', 'Failed to save profile: $e', snackPosition: SnackPosition.BOTTOM, duration: const Duration(seconds: 5));

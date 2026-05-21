@@ -6,6 +6,7 @@ import 'package:chato/src/features/status/screens/status_screen.dart';
 import 'package:chato/src/features/calls/screens/calls_screen.dart';
 import 'package:chato/src/features/contacts/controllers/contact_controller.dart';
 import 'package:chato/src/features/status/controllers/status_controller.dart';
+import 'package:chato/src/features/auth/controllers/auth_controller.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -28,6 +29,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       }
     });
     Get.find<ContactController>().loadContacts();
+    Get.find<AuthController>().initPresence();
   }
 
   @override
