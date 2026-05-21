@@ -9,6 +9,7 @@ import 'package:chato/src/features/home/screens/home_screen.dart';
 import 'package:chato/src/features/chats/screens/chat_screen.dart';
 import 'package:chato/src/features/calls/screens/call_screen.dart';
 import 'package:chato/src/features/settings/screens/settings_screen.dart';
+import 'package:chato/src/features/contacts/screens/contact_picker_screen.dart';
 
 class AppRouter {
   static final pages = [
@@ -20,5 +21,9 @@ class AppRouter {
     GetPage(name: AppRoutes.chat, page: () => const ChatScreen()),
     GetPage(name: AppRoutes.call, page: () => const CallScreen()),
     GetPage(name: AppRoutes.settings, page: () => const SettingsScreen()),
+    GetPage(name: AppRoutes.contactPicker, page: () {
+      final args = Get.arguments as Map<String, dynamic>?;
+      return ContactPickerScreen(purpose: args?['purpose'] as String?);
+    }),
   ];
 }

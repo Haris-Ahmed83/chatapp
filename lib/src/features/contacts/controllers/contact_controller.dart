@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:flutter_contacts/flutter_contacts.dart' as fc;
 
 class ContactController extends GetxController {
   final contacts = <Map<String, String>>[].obs;
@@ -7,14 +8,24 @@ class ContactController extends GetxController {
   Future<void> loadContacts() async {
     loading.value = true;
     try {
-      // Android ke liye flutter_contacts package se real contacts
-      // Web ke liye mock data
-      contacts.value = [
-        {'name': 'Ali Khan', 'phone': '+923001234567'},
-        {'name': 'Sara Ahmed', 'phone': '+923112345678'},
-        {'name': 'Usman Malik', 'phone': '+923212345678'},
-        {'name': 'Fatima Ali', 'phone': '+923312345678'},
-      ];
+      final granted = await fc.FlutterContacts.requestPermission(readonly: true);
+      if (granted) {
+        final raw = await fc.FlutterContacts.getContacts(
+          withProperties: true,
+          withThumbnail: false,
+        );
+        contacts.value = raw.map((c) {
+          final phone = c.phones.isNotEmpty ? c.phones.first.number : '';
+          return {
+            'name': c.displayName.isNotEmpty ? c.displayName : 'Unknown',
+            'phone': phone,
+          };
+        }).where((c) => c['phone']!.isNotEmpty).toList();
+      } else {
+        Get.snackbar('Permission denied', 'Contacts permission is required to show contacts');
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to load contacts: $e');
     } finally {
       loading.value = false;
     }

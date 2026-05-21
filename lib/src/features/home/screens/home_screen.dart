@@ -4,9 +4,21 @@ import 'package:chato/src/routing/app_routes.dart';
 import 'package:chato/src/features/chats/screens/chat_list_screen.dart';
 import 'package:chato/src/features/status/screens/status_screen.dart';
 import 'package:chato/src/features/calls/screens/calls_screen.dart';
+import 'package:chato/src/features/contacts/controllers/contact_controller.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Get.find<ContactController>().loadContacts();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +60,9 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () {},
+          onPressed: () {
+            Get.toNamed(AppRoutes.contactPicker, arguments: {'purpose': 'chat'});
+          },
           child: const Icon(Icons.chat),
         ),
       ),

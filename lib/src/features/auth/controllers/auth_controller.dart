@@ -112,7 +112,10 @@ class AuthController extends GetxController {
     isLoading.value = true;
     try {
       final uid = AppConfig.auth.currentUser?.uid;
-      if (uid == null) return;
+      if (uid == null) {
+        Get.snackbar('Error', 'User not signed in. Please try again.');
+        return;
+      }
 
       await AppConfig.firestore.collection('profiles').doc(uid).set({
         'uid': uid,
@@ -127,7 +130,10 @@ class AuthController extends GetxController {
       isProfileComplete.value = true;
       Get.offAllNamed(AppRoutes.home);
     } catch (e) {
-      Get.snackbar('Error', 'Failed to save profile');
+      Get.snackbar('Firestore Error', 'Failed to save profile.\nCheck Firebase Console → Firestore → Rules\nSet: allow read, write: if request.auth != null;\n\nError: $e',
+        snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 10),
+      );
     } finally {
       isLoading.value = false;
     }

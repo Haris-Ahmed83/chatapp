@@ -7,4 +7,5 @@ class AppRoutes {
   static const chat = '/chat';
   static const call = '/call';
   static const settings = '/settings';
+  static const contactPicker = '/contact-picker';
 }

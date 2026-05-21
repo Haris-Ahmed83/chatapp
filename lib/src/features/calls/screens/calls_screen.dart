@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:chato/src/routing/app_routes.dart';
 
 class CallsScreen extends StatelessWidget {
   const CallsScreen({super.key});
@@ -16,7 +18,9 @@ class CallsScreen extends StatelessWidget {
           const Text('Your call history will appear here', style: TextStyle(color: Colors.grey)),
           const SizedBox(height: 24),
           ElevatedButton.icon(
-            onPressed: () {},
+            onPressed: () {
+              Get.toNamed(AppRoutes.contactPicker, arguments: {'purpose': 'call'});
+            },
             icon: const Icon(Icons.phone),
             label: const Text('Start a call'),
             style: ElevatedButton.styleFrom(

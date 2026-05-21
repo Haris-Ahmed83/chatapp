@@ -44,6 +44,19 @@ class ChatController extends GetxController {
     });
   }
 
+  Future<void> createConversation(String contactName, String contactPhone) async {
+    final uid = AppConfig.auth.currentUser?.uid;
+    if (uid == null) return;
+    final doc = await AppConfig.firestore.collection('conversations').add({
+      'participants': [uid, contactPhone],
+      'participant_names': {uid: 'Me', contactPhone: contactName},
+      'created_at': FieldValue.serverTimestamp(),
+      'last_message': '',
+      'last_message_time': FieldValue.serverTimestamp(),
+    });
+    currentChatId.value = doc.id;
+  }
+
   Future<void> sendMessage(String conversationId, String content) async {
     final uid = AppConfig.auth.currentUser?.uid;
     if (uid == null || content.trim().isEmpty) return;
