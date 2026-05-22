@@ -3,6 +3,7 @@ name: Build APK + Deploy Web
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 jobs:
   build:
